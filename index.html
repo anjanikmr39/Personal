@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Smoke-Free Quit Tracker</title>
+  <title>Clean Streak & Wellness Tracker</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -106,6 +106,8 @@
       align-items: center;
       margin-bottom: 12px;
       margin-top: 8px;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     .section-title {
@@ -296,6 +298,64 @@
       border-color: var(--accent);
     }
 
+    /* Pranayam Benefits Card */
+    .pranayam-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .pranayam-box {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .pranayam-box h4 {
+      color: var(--accent);
+      font-size: 0.98rem;
+      margin-bottom: 10px;
+    }
+
+    .pranayam-box.anulom h4 {
+      color: var(--blue);
+    }
+
+    .pranayam-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+
+    .pranayam-list li {
+      padding-left: 16px;
+      position: relative;
+      color: #e2e8f0;
+    }
+
+    .pranayam-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .pranayam-box.anulom .pranayam-list li::before {
+      color: var(--blue);
+    }
+
+    .pranayam-note {
+      margin-top: 12px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
     /* 30-Day Grid */
     .grid-card {
       background: var(--card);
@@ -375,19 +435,19 @@
     <!-- Core Metrics -->
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label">Complete Smoke-Free Days</div>
+        <div class="stat-label">Clean & Free Days</div>
         <div class="stat-value" id="daysPassed">9 Days</div>
-        <div class="stat-sub">Last cigarette: Nov 12, 2026</div>
+        <div class="stat-sub">Started fresh: Nov 13, 2026</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Money Saved</div>
         <div class="stat-value" id="moneySaved">₹2,250</div>
-        <div class="stat-sub">@ ₹250/day (10 Ice Bursts)</div>
+        <div class="stat-sub">@ ₹250 saved every single day</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Cigarettes Avoided</div>
-        <div class="stat-value" id="cigsAvoided">90</div>
-        <div class="stat-sub">Lungs & dopamine recovering</div>
+        <div class="stat-label">Healthy Choices Made</div>
+        <div class="stat-value" id="choicesCount">90</div>
+        <div class="stat-sub">Lungs & natural energy resetting</div>
       </div>
     </div>
 
@@ -417,7 +477,7 @@
           <button class="checkbox-btn" id="chk-water">✓</button>
           <div class="habit-info">
             <h3>Daily Water Hydration Goal (<span id="waterCount">0</span> / 8 Glasses)</h3>
-            <p>Flushes residual toxins and beats afternoon/evening lethargy</p>
+            <p>Refreshes your body and beats afternoon/evening lethargy</p>
           </div>
         </div>
       </div>
@@ -431,20 +491,20 @@
       </div>
     </div>
 
-    <!-- Habit 3: Craving & Smoke-Free Check -->
+    <!-- Habit 3: Craving & Discipline Check -->
     <div class="habit-card" id="card-craving">
       <div class="habit-row">
         <div class="habit-left" onclick="toggleHabit('craving')">
           <button class="checkbox-btn" id="chk-craving">✓</button>
           <div class="habit-info">
-            <h3>Stayed Smoke-Free & Managed Cravings</h3>
+            <h3>Stayed Strong & Managed Urges Today</h3>
             <p>Log today's evening urge level and healthy swap (70% dark chocolate, makhana, mint)</p>
           </div>
         </div>
       </div>
       <div class="craving-panel">
         <div class="craving-levels">
-          <button class="pill-btn" id="lvl-none" onclick="setCravingLevel('none')">No Craving</button>
+          <button class="pill-btn" id="lvl-none" onclick="setCravingLevel('none')">No Urge</button>
           <button class="pill-btn" id="lvl-mild" onclick="setCravingLevel('mild')">Mild Urge</button>
           <button class="pill-btn" id="lvl-strong" onclick="setCravingLevel('strong')">Strong Evening Urge (Beat It!)</button>
         </div>
@@ -452,16 +512,49 @@
           type="text"
           class="note-input"
           id="cravingNote"
-          placeholder="What triggered it or what healthy swap did you use today? (Auto-saves)"
+          placeholder="What healthy swap or evening routine worked for you today? (Auto-saves)"
           oninput="saveNote()"
         />
       </div>
     </div>
 
+    <!-- 10 Pranayam Benefits (5 Kapalbhati + 5 Anulom Vilom) -->
+    <div class="grid-card">
+      <div class="section-header" style="margin-bottom: 4px;">
+        <div class="section-title">10 Pranayam Benefits for Your Recovery</div>
+        <div class="date-badge">5 Kapalbhati • 5 Anulom Vilom</div>
+      </div>
+      <div class="pranayam-grid">
+        <div class="pranayam-box">
+          <h4>Kapalbhati (5 Benefits)</h4>
+          <ul class="pranayam-list">
+            <li><strong>Clears & Energizes Airways:</strong> Vigorous exhalations help clear stale air as breathing capacity improves.</li>
+            <li><strong>Counters Numbness & Low Energy:</strong> Rhythmic brisk breathing provides a natural wake-up boost.</li>
+            <li><strong>Sharpens Mental Alertness:</strong> Helps cut through brain fog for clearer daytime focus.</li>
+            <li><strong>Supports Digestion & Core Rhythm:</strong> Rhythmic abdominal contractions support healthy digestion and gut flow.</li>
+            <li><strong>Builds Strong Morning Discipline:</strong> A focused breath routine anchors a healthy new daily pattern.</li>
+          </ul>
+        </div>
+        <div class="pranayam-box anulom">
+          <h4>Anulom Vilom (5 Benefits)</h4>
+          <ul class="pranayam-list">
+            <li><strong>Calms Evening Restlessness:</strong> Slow, steady breathing helps ease agitation when evening urges hit.</li>
+            <li><strong>Supports a Calm Nervous System:</strong> Smooth inhales and exhales encourage relaxation without sugar spikes.</li>
+            <li><strong>Improves Breath Pacing:</strong> Controlled alternate-nostril breathing builds calm pacing when urges rise.</li>
+            <li><strong>Promotes Emotional Steadiness:</strong> Helps steady mood swings and mild irritability during early recovery.</li>
+            <li><strong>Creates a Grounding Reset:</strong> Offers a quiet pause before stepping out or winding down for the night.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="pranayam-note">
+        Practice gently on an empty stomach, ease off if dizzy, and consult a doctor first if you have respiratory, heart, or blood pressure concerns.
+      </p>
+    </div>
+
     <!-- 30-Day Progress Grid -->
     <div class="grid-card">
       <div class="section-header" style="margin-bottom: 0;">
-        <div class="section-title">First 30-Day Milestone Tracker</div>
+        <div class="section-title">First 30-Day Clean Streak Tracker</div>
         <div class="date-badge" id="streakBadge">9 / 30 Days</div>
       </div>
       <div class="days-grid" id="daysGrid"></div>
@@ -470,25 +563,25 @@
     <!-- Body Recovery Timeline -->
     <div class="milestones">
       <div class="milestone-item">
-        <strong>✓ Day 3 — Nicotine Cleared</strong>
-        100% of physical nicotine left your bloodstream.
+        <strong>✓ Day 3 — Complete System Reset</strong>
+        Physical dependence cleared from your bloodstream.
       </div>
       <div class="milestone-item">
         <strong>✓ Day 7–14 — Dopamine & Energy Reset</strong>
         Brain fog and numbness lift as natural energy returns.
       </div>
       <div class="milestone-item">
-        <strong>→ Day 30 — Lung Capacity Boost</strong>
-        Cilia regrow, breathing deepens, and ₹7,500 saved.
+        <strong>→ Day 30 — Full Lung Capacity Boost</strong>
+        Breathing deepens, stamina rises, and ₹7,500 saved.
       </div>
     </div>
   </div>
 
   <script>
-    // Quit date configuration: Nov 12, 2026 (Last smoking day)
-    const QUIT_DATE = new Date(2026, 10, 12); // Month is 0-indexed (10 = November)
-    const DAILY_COST = 250; // 10 Ice Bursts @ ₹25
-    const CIGS_PER_DAY = 10;
+    // Clean streak reference date: Nov 12, 2026 (Day 1 = Nov 13, 2026)
+    const START_DATE = new Date(2026, 10, 12); // Month is 0-indexed (10 = November)
+    const DAILY_SAVINGS = 250;
+    const DAILY_CHOICES = 10;
 
     function getTodayKey() {
       const now = new Date();
@@ -498,15 +591,15 @@
     function calculateDaysPassed() {
       const now = new Date();
       const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const quitMidnight = new Date(QUIT_DATE.getFullYear(), QUIT_DATE.getMonth(), QUIT_DATE.getDate());
-      const diffTime = todayMidnight - quitMidnight;
+      const startMidnight = new Date(START_DATE.getFullYear(), START_DATE.getMonth(), START_DATE.getDate());
+      const diffTime = todayMidnight - startMidnight;
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
       return Math.max(0, diffDays);
     }
 
     // Load or initialize daily state
     const todayKey = getTodayKey();
-    const storageKey = `quit_tracker_${todayKey}`;
+    const storageKey = `clean_tracker_${todayKey}`;
     let state = JSON.parse(localStorage.getItem(storageKey)) || {
       pranayam: false,
       water: false,
@@ -557,8 +650,8 @@
     function renderUI() {
       const days = calculateDaysPassed();
       document.getElementById('daysPassed').textContent = `${days} Day${days === 1 ? '' : 's'}`;
-      document.getElementById('moneySaved').textContent = `₹${(days * DAILY_COST).toLocaleString('en-IN')}`;
-      document.getElementById('cigsAvoided').textContent = (days * CIGS_PER_DAY).toLocaleString('en-IN');
+      document.getElementById('moneySaved').textContent = `₹${(days * DAILY_SAVINGS).toLocaleString('en-IN')}`;
+      document.getElementById('choicesCount').textContent = (days * DAILY_CHOICES).toLocaleString('en-IN');
 
       const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
       document.getElementById('todayDateDisplay').textContent = new Date().toLocaleDateString('en-IN', options);
