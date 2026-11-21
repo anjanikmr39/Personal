@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smoke-Free Quit Tracker</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card-hover: #273549;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #10b981;
+      --accent-soft: rgba(16, 185, 129, 0.15);
+      --blue: #38bdf8;
+      --blue-soft: rgba(56, 189, 248, 0.15);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245, 158, 11, 0.15);
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 20px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    /* Motivational Banner */
+    .quote-banner {
+      background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%);
+      border: 1px solid var(--accent);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 20px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .quote-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .quote-text {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .stat-sub {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      margin-top: 8px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .date-badge {
+      font-size: 0.8rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: var(--muted);
+    }
+
+    /* Daily Habits Checklist */
+    .habit-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .habit-card.completed {
+      border-color: var(--accent);
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.08), var(--card));
+    }
+
+    .habit-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .habit-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+    }
+
+    .checkbox-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 2px solid var(--muted);
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: transparent;
+      font-weight: 900;
+      font-size: 16px;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .checkbox-btn.checked {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #052e16;
+    }
+
+    .habit-info h3 {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .habit-info p {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* Water Controls */
+    .water-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .btn-small {
+      background: var(--blue-soft);
+      color: var(--blue);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-small:hover {
+      background: rgba(56, 189, 248, 0.25);
+    }
+
+    .btn-reset {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+
+    .water-bar-bg {
+      flex: 1;
+      min-width: 120px;
+      height: 10px;
+      background: #0f172a;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .water-bar-fill {
+      height: 100%;
+      background: var(--blue);
+      width: 0%;
+      transition: width 0.25s ease;
+    }
+
+    /* Craving & Swap Controls */
+    .craving-panel {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .craving-levels {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill-btn {
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: #0f172a;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .pill-btn.active-none {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .pill-btn.active-mild {
+      background: var(--amber-soft);
+      color: var(--amber);
+      border-color: var(--amber);
+    }
+
+    .pill-btn.active-strong {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+
+    .note-input {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+    }
+
+    .note-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    /* 30-Day Grid */
+    .grid-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 20px;
+    }
+
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 540px) {
+      .days-grid {
+        grid-template-columns: repeat(6, 1fr);
+      }
+    }
+
+    .day-box {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--muted);
+      background: #0f172a;
+    }
+
+    .day-box.done {
+      background: var(--accent);
+      color: #052e16;
+      border-color: var(--accent);
+    }
+
+    .day-box.today {
+      box-shadow: 0 0 0 2px #ffffff;
+    }
+
+    /* Milestones */
+    .milestones {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .milestone-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 0.85rem;
+    }
+
+    .milestone-item strong {
+      display: block;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Motivational Quote -->
+    <div class="quote-banner">
+      <div class="quote-label">Daily Reminder</div>
+      <div class="quote-text">"If you don't change yourself, don't expect things to change."</div>
+    </div>
+
+    <!-- Core Metrics -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Complete Smoke-Free Days</div>
+        <div class="stat-value" id="daysPassed">9 Days</div>
+        <div class="stat-sub">Last cigarette: Nov 12, 2026</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Money Saved</div>
+        <div class="stat-value" id="moneySaved">₹2,250</div>
+        <div class="stat-sub">@ ₹250/day (10 Ice Bursts)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Cigarettes Avoided</div>
+        <div class="stat-value" id="cigsAvoided">90</div>
+        <div class="stat-sub">Lungs & dopamine recovering</div>
+      </div>
+    </div>
+
+    <!-- Daily Action Checklist -->
+    <div class="section-header">
+      <div class="section-title">Today's Discipline Tick Marks</div>
+      <div class="date-badge" id="todayDateDisplay">Today</div>
+    </div>
+
+    <!-- Habit 1: Pranayam -->
+    <div class="habit-card" id="card-pranayam">
+      <div class="habit-row">
+        <div class="habit-left" onclick="toggleHabit('pranayam')">
+          <button class="checkbox-btn" id="chk-pranayam">✓</button>
+          <div class="habit-info">
+            <h3>Pranayam & Deep Breathing Done</h3>
+            <p>Clears lung pathways, calms nervous system & reduces evening restlessness</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Habit 2: Water Intake -->
+    <div class="habit-card" id="card-water">
+      <div class="habit-row">
+        <div class="habit-left" onclick="toggleHabit('water')">
+          <button class="checkbox-btn" id="chk-water">✓</button>
+          <div class="habit-info">
+            <h3>Daily Water Hydration Goal (<span id="waterCount">0</span> / 8 Glasses)</h3>
+            <p>Flushes residual toxins and beats afternoon/evening lethargy</p>
+          </div>
+        </div>
+      </div>
+      <div class="water-controls">
+        <button class="btn-small" onclick="addWater(1)">+1 Glass</button>
+        <button class="btn-small" onclick="addWater(2)">+2 Glasses</button>
+        <div class="water-bar-bg">
+          <div class="water-bar-fill" id="waterBar"></div>
+        </div>
+        <button class="btn-reset" onclick="resetWater()">Reset</button>
+      </div>
+    </div>
+
+    <!-- Habit 3: Craving & Smoke-Free Check -->
+    <div class="habit-card" id="card-craving">
+      <div class="habit-row">
+        <div class="habit-left" onclick="toggleHabit('craving')">
+          <button class="checkbox-btn" id="chk-craving">✓</button>
+          <div class="habit-info">
+            <h3>Stayed Smoke-Free & Managed Cravings</h3>
+            <p>Log today's evening urge level and healthy swap (70% dark chocolate, makhana, mint)</p>
+          </div>
+        </div>
+      </div>
+      <div class="craving-panel">
+        <div class="craving-levels">
+          <button class="pill-btn" id="lvl-none" onclick="setCravingLevel('none')">No Craving</button>
+          <button class="pill-btn" id="lvl-mild" onclick="setCravingLevel('mild')">Mild Urge</button>
+          <button class="pill-btn" id="lvl-strong" onclick="setCravingLevel('strong')">Strong Evening Urge (Beat It!)</button>
+        </div>
+        <input
+          type="text"
+          class="note-input"
+          id="cravingNote"
+          placeholder="What triggered it or what healthy swap did you use today? (Auto-saves)"
+          oninput="saveNote()"
+        />
+      </div>
+    </div>
+
+    <!-- 30-Day Progress Grid -->
+    <div class="grid-card">
+      <div class="section-header" style="margin-bottom: 0;">
+        <div class="section-title">First 30-Day Milestone Tracker</div>
+        <div class="date-badge" id="streakBadge">9 / 30 Days</div>
+      </div>
+      <div class="days-grid" id="daysGrid"></div>
+    </div>
+
+    <!-- Body Recovery Timeline -->
+    <div class="milestones">
+      <div class="milestone-item">
+        <strong>✓ Day 3 — Nicotine Cleared</strong>
+        100% of physical nicotine left your bloodstream.
+      </div>
+      <div class="milestone-item">
+        <strong>✓ Day 7–14 — Dopamine & Energy Reset</strong>
+        Brain fog and numbness lift as natural energy returns.
+      </div>
+      <div class="milestone-item">
+        <strong>→ Day 30 — Lung Capacity Boost</strong>
+        Cilia regrow, breathing deepens, and ₹7,500 saved.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Quit date configuration: Nov 12, 2026 (Last smoking day)
+    const QUIT_DATE = new Date(2026, 10, 12); // Month is 0-indexed (10 = November)
+    const DAILY_COST = 250; // 10 Ice Bursts @ ₹25
+    const CIGS_PER_DAY = 10;
+
+    function getTodayKey() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    }
+
+    function calculateDaysPassed() {
+      const now = new Date();
+      const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const quitMidnight = new Date(QUIT_DATE.getFullYear(), QUIT_DATE.getMonth(), QUIT_DATE.getDate());
+      const diffTime = todayMidnight - quitMidnight;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      return Math.max(0, diffDays);
+    }
+
+    // Load or initialize daily state
+    const todayKey = getTodayKey();
+    const storageKey = `quit_tracker_${todayKey}`;
+    let state = JSON.parse(localStorage.getItem(storageKey)) || {
+      pranayam: false,
+      water: false,
+      waterGlasses: 0,
+      craving: false,
+      cravingLevel: '',
+      cravingNote: ''
+    };
+
+    function saveState() {
+      localStorage.setItem(storageKey, JSON.stringify(state));
+      renderUI();
+    }
+
+    function toggleHabit(habit) {
+      state[habit] = !state[habit];
+      if (habit === 'water' && state.water && state.waterGlasses < 8) {
+        state.waterGlasses = 8;
+      }
+      saveState();
+    }
+
+    function addWater(glasses) {
+      state.waterGlasses = Math.min(16, (state.waterGlasses || 0) + glasses);
+      if (state.waterGlasses >= 8) {
+        state.water = true;
+      }
+      saveState();
+    }
+
+    function resetWater() {
+      state.waterGlasses = 0;
+      state.water = false;
+      saveState();
+    }
+
+    function setCravingLevel(level) {
+      state.cravingLevel = level;
+      state.craving = true;
+      saveState();
+    }
+
+    function saveNote() {
+      state.cravingNote = document.getElementById('cravingNote').value;
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    }
+
+    function renderUI() {
+      const days = calculateDaysPassed();
+      document.getElementById('daysPassed').textContent = `${days} Day${days === 1 ? '' : 's'}`;
+      document.getElementById('moneySaved').textContent = `₹${(days * DAILY_COST).toLocaleString('en-IN')}`;
+      document.getElementById('cigsAvoided').textContent = (days * CIGS_PER_DAY).toLocaleString('en-IN');
+
+      const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
+      document.getElementById('todayDateDisplay').textContent = new Date().toLocaleDateString('en-IN', options);
+
+      // Update habits
+      ['pranayam', 'water', 'craving'].forEach(habit => {
+        const chk = document.getElementById(`chk-${habit}`);
+        const card = document.getElementById(`card-${habit}`);
+        if (state[habit]) {
+          chk.classList.add('checked');
+          card.classList.add('completed');
+        } else {
+          chk.classList.remove('checked');
+          card.classList.remove('completed');
+        }
+      });
+
+      // Update water
+      document.getElementById('waterCount').textContent = state.waterGlasses || 0;
+      const pct = Math.min(100, ((state.waterGlasses || 0) / 8) * 100);
+      document.getElementById('waterBar').style.width = `${pct}%`;
+
+      // Update craving level buttons
+      ['none', 'mild', 'strong'].forEach(lvl => {
+        const btn = document.getElementById(`lvl-${lvl}`);
+        btn.className = 'pill-btn';
+        if (state.cravingLevel === lvl) {
+          btn.classList.add(`active-${lvl}`);
+        }
+      });
+
+      document.getElementById('cravingNote').value = state.cravingNote || '';
+
+      // Render 30-day grid
+      const grid = document.getElementById('daysGrid');
+      grid.innerHTML = '';
+      for (let i = 1; i <= 30; i++) {
+        const box = document.createElement('div');
+        box.className = 'day-box';
+        box.textContent = i;
+        if (i <= days) box.classList.add('done');
+        if (i === days) box.classList.add('today');
+        grid.appendChild(box);
+      }
+      document.getElementById('streakBadge').textContent = `${Math.min(days, 30)} / 30 Days`;
+    }
+
+    renderUI();
+  </script>
+</body>
+</html>
