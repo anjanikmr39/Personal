@@ -186,6 +186,69 @@
       color: var(--muted);
     }
 
+    /* Sub-ticks inside Pranayam card */
+    .sub-ticks-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .sub-tick-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .sub-tick-box.checked {
+      border-color: var(--accent);
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), #0f172a);
+    }
+
+    .sub-tick-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sub-tick-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .sub-tick-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .btn-mini {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .btn-mini.blue {
+      background: var(--blue-soft);
+      color: var(--blue);
+      border-color: rgba(56, 189, 248, 0.35);
+    }
+
     /* Water Controls */
     .water-controls {
       display: flex;
@@ -496,15 +559,47 @@
       <div class="date-badge" id="todayDateDisplay">Today</div>
     </div>
 
-    <!-- Habit 1: Pranayam -->
+    <!-- Habit 1: Pranayam (Broken into Kapalbhati & Anulom Vilom) -->
     <div class="habit-card" id="card-pranayam">
       <div class="habit-row">
-        <div class="habit-left" onclick="toggleHabit('pranayam')">
+        <div class="habit-left" onclick="togglePranayamMaster()">
           <button class="checkbox-btn" id="chk-pranayam">✓</button>
           <div class="habit-info">
-            <h3>Pranayam & Deep Breathing Done</h3>
+            <h3>Pranayam & Deep Breathing Done (<span id="pranayamDoneCount">0</span> / 2 Parts)</h3>
             <p>Clears lung pathways, calms nervous system & reduces evening restlessness</p>
           </div>
+        </div>
+      </div>
+
+      <div class="sub-ticks-row">
+        <div class="sub-tick-box" id="box-kapalbhati" onclick="togglePranayamPart('kapalbhati')">
+          <div class="sub-tick-left">
+            <button class="checkbox-btn" id="chk-kapalbhati" type="button">✓</button>
+            <div>
+              <div class="sub-tick-title">Kapalbhati</div>
+              <div class="sub-tick-meta">Min <span id="kapalbhatiCount">0</span> / 300 strokes</div>
+            </div>
+          </div>
+          <button
+            class="btn-mini"
+            type="button"
+            onclick="event.stopPropagation(); addKapalbhati(100)"
+          >+100</button>
+        </div>
+
+        <div class="sub-tick-box" id="box-anulom" onclick="togglePranayamPart('anulom')">
+          <div class="sub-tick-left">
+            <button class="checkbox-btn" id="chk-anulom" type="button">✓</button>
+            <div>
+              <div class="sub-tick-title">Anulom Vilom</div>
+              <div class="sub-tick-meta">Min <span id="anulomMins">0</span> / 15 min</div>
+            </div>
+          </div>
+          <button
+            class="btn-mini blue"
+            type="button"
+            onclick="event.stopPropagation(); addAnulomMins(5)"
+          >+5 min</button>
         </div>
       </div>
     </div>
@@ -584,7 +679,7 @@
     <!-- 10 Pranayam Benefits (5 Kapalbhati + 5 Anulom Vilom) -->
     <div class="grid-card">
       <div class="section-header" style="margin-bottom: 4px;">
-        <div class="section-title">10 Pranayam Benefits for Better Health </div>
+        <div class="section-title">10 Pranayam Benefits for Your Recovery</div>
         <div class="date-badge">5 Kapalbhati • 5 Anulom Vilom</div>
       </div>
       <div class="pranayam-grid">
@@ -621,6 +716,8 @@
     const TARGET_DAYS = 365;
     const DAILY_SAVINGS = 250;
     const DAILY_CHOICES = 10;
+    const KAPALBHATI_TARGET = 300;
+    const ANULOM_TARGET_MINS = 15;
 
     function getTodayKey() {
       const now = new Date();
@@ -639,18 +736,70 @@
     // Load or initialize daily state
     const todayKey = getTodayKey();
     const storageKey = `clean_tracker_${todayKey}`;
-    let state = JSON.parse(localStorage.getItem(storageKey)) || {
-      pranayam: false,
-      water: false,
-      waterGlasses: 0,
-      craving: false,
-      cravingLevel: '',
-      cravingNote: ''
+    const savedRaw = JSON.parse(localStorage.getItem(storageKey)) || {};
+    let state = {
+      pranayam: Boolean(savedRaw.pranayam),
+      kapalbhatiDone: savedRaw.kapalbhatiDone !== undefined ? Boolean(savedRaw.kapalbhatiDone) : Boolean(savedRaw.pranayam),
+      kapalbhatiCount: Number(savedRaw.kapalbhatiCount) || (savedRaw.pranayam ? KAPALBHATI_TARGET : 0),
+      anulomDone: savedRaw.anulomDone !== undefined ? Boolean(savedRaw.anulomDone) : Boolean(savedRaw.pranayam),
+      anulomMins: Number(savedRaw.anulomMins) || (savedRaw.pranayam ? ANULOM_TARGET_MINS : 0),
+      water: Boolean(savedRaw.water),
+      waterGlasses: Number(savedRaw.waterGlasses) || 0,
+      craving: Boolean(savedRaw.craving),
+      cravingLevel: savedRaw.cravingLevel || '',
+      cravingNote: savedRaw.cravingNote || ''
     };
 
+    function syncPranayamMaster() {
+      state.pranayam = Boolean(state.kapalbhatiDone && state.anulomDone);
+    }
+
     function saveState() {
+      syncPranayamMaster();
       localStorage.setItem(storageKey, JSON.stringify(state));
       renderUI();
+    }
+
+    function togglePranayamMaster() {
+      const next = !state.pranayam;
+      state.kapalbhatiDone = next;
+      state.anulomDone = next;
+      if (next) {
+        if (state.kapalbhatiCount < KAPALBHATI_TARGET) state.kapalbhatiCount = KAPALBHATI_TARGET;
+        if (state.anulomMins < ANULOM_TARGET_MINS) state.anulomMins = ANULOM_TARGET_MINS;
+      }
+      saveState();
+    }
+
+    function togglePranayamPart(part) {
+      if (part === 'kapalbhati') {
+        state.kapalbhatiDone = !state.kapalbhatiDone;
+        if (state.kapalbhatiDone && state.kapalbhatiCount < KAPALBHATI_TARGET) {
+          state.kapalbhatiCount = KAPALBHATI_TARGET;
+        }
+      } else if (part === 'anulom') {
+        state.anulomDone = !state.anulomDone;
+        if (state.anulomDone && state.anulomMins < ANULOM_TARGET_MINS) {
+          state.anulomMins = ANULOM_TARGET_MINS;
+        }
+      }
+      saveState();
+    }
+
+    function addKapalbhati(strokes) {
+      state.kapalbhatiCount = Math.min(2000, (state.kapalbhatiCount || 0) + strokes);
+      if (state.kapalbhatiCount >= KAPALBHATI_TARGET) {
+        state.kapalbhatiDone = true;
+      }
+      saveState();
+    }
+
+    function addAnulomMins(mins) {
+      state.anulomMins = Math.min(120, (state.anulomMins || 0) + mins);
+      if (state.anulomMins >= ANULOM_TARGET_MINS) {
+        state.anulomDone = true;
+      }
+      saveState();
     }
 
     function toggleHabit(habit) {
@@ -687,6 +836,7 @@
     }
 
     function renderUI() {
+      syncPranayamMaster();
       const days = calculateDaysPassed();
       const rawPct = (days / TARGET_DAYS) * 100;
       const clampedPct = Math.min(100, rawPct);
@@ -709,6 +859,22 @@
 
       const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
       document.getElementById('todayDateDisplay').textContent = new Date().toLocaleDateString('en-IN', options);
+
+      // Update Pranayam sub-ticks
+      const doneParts = (state.kapalbhatiDone ? 1 : 0) + (state.anulomDone ? 1 : 0);
+      document.getElementById('pranayamDoneCount').textContent = doneParts;
+      document.getElementById('kapalbhatiCount').textContent = state.kapalbhatiCount || 0;
+      document.getElementById('anulomMins').textContent = state.anulomMins || 0;
+
+      const kbChk = document.getElementById('chk-kapalbhati');
+      const kbBox = document.getElementById('box-kapalbhati');
+      kbChk.classList.toggle('checked', Boolean(state.kapalbhatiDone));
+      kbBox.classList.toggle('checked', Boolean(state.kapalbhatiDone));
+
+      const avChk = document.getElementById('chk-anulom');
+      const avBox = document.getElementById('box-anulom');
+      avChk.classList.toggle('checked', Boolean(state.anulomDone));
+      avBox.classList.toggle('checked', Boolean(state.anulomDone));
 
       // Update habits
       ['pranayam', 'water', 'craving'].forEach(habit => {
